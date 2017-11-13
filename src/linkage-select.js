@@ -1,6 +1,8 @@
 import { mergeOption, triggerEvent } from './util';
 
 const DEFAULT_OPTS = {
+  data: [],
+  selected: [],
   tipText: '请选择',
   labelKey: 'label',
   valueKey: 'value',
@@ -10,16 +12,11 @@ const DEFAULT_OPTS = {
 class LinkageSelector {
   wrapperEl = {};
   selectEls = {};
-  data = [];
-  selectedData = [];
   opts = {};
 
   constructor(el, opts = {}) {
     this.wrapperEl = typeof el !== 'string' ? el : document.querySelectorAll(el);
     this.selectEls = this.wrapperEl.querySelectorAll('select');
-    this.data = opts.data;
-    this.selectedData = opts.selectedData;
-    this.tipText = opts.tipText;
     mergeOption(this.opts, DEFAULT_OPTS);
     this._init();
   }
@@ -34,7 +31,7 @@ class LinkageSelector {
     }
   }
 
-  _findOptionData(data, findVal) {
+  _findOption(data, findVal) {
     for (let i = 0; i < data.length; i++) {
       if (data[i].value === findVal) {
         return data[i];
@@ -65,7 +62,7 @@ class LinkageSelector {
     //
     const elems = this.selectEls;
     for (let i = 0; i < elems.length; i++) {
-      const selectOpt = elems[i].querySelector(`option[value="${this.selectedData[i]}"]`);
+      const selectOpt = elems[i].querySelector(`option[value="${this.selected[i]}"]`);
       selectOpt.selected = true;
 
       triggerEvent('change', elems[i]);
@@ -96,7 +93,7 @@ class LinkageSelector {
         ? this.data
         : this.selectDatas[prevSelectorIndex].children ? this.selectDatas[prevSelectorIndex].children : [];
 
-      this.selectDatas[currentSelectorIndex] = this._findOptionData(findData, currentSelection.value);
+      this.selectDatas[currentSelectorIndex] = this._findOption(findData, currentSelection.value);
 
       const isChildren = this.selectDatas[currentSelectorIndex].hasOwnProperty('children');
       const renderData = isChildren
@@ -117,7 +114,7 @@ class LinkageSelector {
   }
 
   reset() {
-    this.selectedData = [];
+    this.selected = [];
     const selectedOpts = this.wrapperEl.querySelectorAll('option[selected="selected"]');
     for (let i = 0; i < selectedOpts; i++) {
       selectedOpts[i].selected = false;
@@ -129,12 +126,14 @@ class LinkageSelector {
   }
 
   disable() {
+    this._unbindEvent();
     this.selectEls.forEach((el) => el.disabled = true);
   }
 
   enable() {
+    this._bindEvent();
     this.selectEls.forEach((el) => el.disabled = false);
   }
 }
 
-export default LinkageSelector;
+export default LinkageSelection;

@@ -1,3 +1,3 @@
-import LinkageSelect from './linkage-select';
+import LinkageSelection from './linkage-select';
 
-export default LinkageSelect;
+export default LinkageSelection;
