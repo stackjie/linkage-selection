@@ -9,5 +9,8 @@ export function mergeOption (target, ...object) {
   return target;
 }
 
-export function triggerEvent (eventName, dom) {
+export function triggerEvent (eventName, dom, ...opts) {
+  const evt = document.createEvent('Events');
+  evt.initEvent(eventName, ...opts);
+  dom.dispatchEvent(evt);
 }
