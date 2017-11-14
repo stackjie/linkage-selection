@@ -9,12 +9,12 @@ const isProduction = process.env.NODE_ENV === 'production';
 export default {
   entry: 'src/index.js',
   format: 'umd',
-  moduleName:'LinkageSelect',
+  moduleName:'LinkageSelection',
   plugins: [
     commonjs(),
     eslint(),
     babel({ runtimeHelpers: true }),
     (isProduction && uglify())
   ],
-  dest: isProduction ? 'dist/linkage-select.min.js' : 'dist/linkage-select.js'
+  dest: isProduction ? 'dist/linkage-selection.min.js' : 'dist/linkage-selection.js'
 };
