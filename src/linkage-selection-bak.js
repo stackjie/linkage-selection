@@ -1,4 +1,4 @@
-import { mergeOption, triggerEvent } from './util';
+import {mergeOption, triggerEvent} from './util';
 
 const DEFAULT_OPTS = {
   data: [],
@@ -9,7 +9,7 @@ const DEFAULT_OPTS = {
   childrenKey: 'children'
 };
 
-class LinkageSelector {
+export default class LinkageSelection {
   wrapperEl = {};
   selectEls = {};
   opts = {};
@@ -17,16 +17,16 @@ class LinkageSelector {
   constructor(el, opts = {}) {
     this.wrapperEl = typeof el !== 'string' ? el : document.querySelectorAll(el);
     this.selectEls = this.wrapperEl.querySelectorAll('select');
-    mergeOption(this.opts, DEFAULT_OPTS);
+    this.opts = mergeOption(opts, DEFAULT_OPTS);
     this._init();
   }
 
   _init() {
     this._bindEvent();
-    this._renderOptions(this.selectEls.eq(0), this.data);
+    this._renderOptions(this.selectEls.eq(0), this.opts.data);
     this.selectEls.eq(0).trigger('change');
 
-    if (this.selectDatas !== [] && Array.isArray(this.selectDatas)) {
+    if (this.selected !== [] && Array.isArray(this.selected)) {
       this._selectDefaultOption();
     }
   }
@@ -44,7 +44,7 @@ class LinkageSelector {
   _renderOptions(selectEl, data = []) {
     let html = '';
     for (let i = 0; i < data.length; i++) {
-      html += i === 0 ? `<option>${this.tipText}</option>` : '';
+      html += i === 0 ? `<option>${this.opts.tipText}</option>` : '';
       html += `<option value="${data[i].value}">${data[i].label}</option>`;
     }
     selectEl.innerHTML = html;
@@ -91,13 +91,13 @@ class LinkageSelector {
     if (nextSelectorIndex < this.selectEls.length) {
       const findData = currentSelectorIndex === 0
         ? this.data
-        : this.selectDatas[prevSelectorIndex].children ? this.selectDatas[prevSelectorIndex].children : [];
+        : this.opts.selected[prevSelectorIndex].children ? this.opts.selected[prevSelectorIndex].children : [];
 
-      this.selectDatas[currentSelectorIndex] = this._findOption(findData, currentSelection.value);
+      this.opts.selected[currentSelectorIndex] = this._findOption(findData, currentSelection.value);
 
-      const isChildren = this.selectDatas[currentSelectorIndex].hasOwnProperty('children');
+      const isChildren = this.opts.selected[currentSelectorIndex].hasOwnProperty('children');
       const renderData = isChildren
-        ? this.selectDatas[currentSelectorIndex].children
+        ? this.opts.selected[currentSelectorIndex].children
         : [];
       this._renderOptions(this.selectEls[nextSelectorIndex], renderData);
 
@@ -110,30 +110,29 @@ class LinkageSelector {
   };
 
   _bindEvent() {
-   this.wrapperEl.addEventListener('change', this._handleChangeOptions);
-  }
-
-  reset() {
-    this.selected = [];
-    const selectedOpts = this.wrapperEl.querySelectorAll('option[selected="selected"]');
-    for (let i = 0; i < selectedOpts; i++) {
-      selectedOpts[i].selected = false;
-    }
+    this.wrapperEl.addEventListener('change', this._handleChangeOptions);
   }
 
   _unbindEvent() {
     this.wrapperEl.removeEventListener('change');
   }
 
+  reset() {
+    this.selected = [];
+    const selectedOptEls = this.wrapperEl.querySelectorAll('option[selected="selected"]');
+    selectedOptEls.forEach((el) => (el.selected = false));
+    // for (let i = 0; i < selectedOpts; i++) {
+    //   selectedOpts[i].selected = false;
+    // }
+  }
+
   disable() {
     this._unbindEvent();
-    this.selectEls.forEach((el) => el.disabled = true);
+    this.selectEls.forEach((el) => (el.disabled = true));
   }
 
   enable() {
     this._bindEvent();
-    this.selectEls.forEach((el) => el.disabled = false);
+    this.selectEls.forEach((el) => (el.disabled = false));
   }
 }
-
-export default LinkageSelection;
